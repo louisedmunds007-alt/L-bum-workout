@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="manifest.webmanifest">
+<title>L-Bum Workout</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#f5f5f5;background:#101010;--card:#1b1b1b;--muted:#a8a8a8;--accent:#fff}
+*{box-sizing:border-box}body{margin:0;background:#101010}header{position:sticky;top:0;z-index:5;background:#101010eF;backdrop-filter:blur(12px);padding:14px 16px 10px;border-bottom:1px solid #2b2b2b}h1{font-size:22px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:3px}.tabs{display:flex;gap:8px;overflow:auto;padding:10px 12px;background:#101010;position:sticky;top:61px;z-index:4}.tabs button{border:1px solid #333;background:#191919;color:#ddd;border-radius:999px;padding:8px 12px;white-space:nowrap}.tabs button.active{background:#fff;color:#111}.wrap{max-width:720px;margin:auto;padding:8px 12px 100px}.card{background:var(--card);border:1px solid #2c2c2c;border-radius:16px;padding:14px;margin:10px 0}.dayhead{display:flex;justify-content:space-between;align-items:center}.dayhead h2{margin:0;font-size:18px}.tag{font-size:11px;color:#111;background:#fff;border-radius:999px;padding:5px 8px}.exercise{border-top:1px solid #303030;padding:13px 0}.exercise:first-child{border-top:0}.ename{font-weight:700}.meta{color:var(--muted);font-size:12px;margin:4px 0 9px}.row{display:grid;grid-template-columns:1fr 92px 92px;gap:7px;align-items:center}.row input{width:100%;background:#111;color:#fff;border:1px solid #3a3a3a;border-radius:9px;padding:9px;font-size:14px}.row button,.btn{border:0;border-radius:10px;padding:9px 10px;background:#2a2a2a;color:#fff}.row button.done{background:#fff;color:#111}.small{font-size:11px;color:var(--muted)}.bottom{position:fixed;bottom:0;left:0;right:0;background:#111e;border-top:1px solid #333;padding:10px;display:flex;justify-content:center;gap:8px;backdrop-filter:blur(10px)}.primary{background:#fff;color:#111}.timer{font-size:42px;font-variant-numeric:tabular-nums;text-align:center;margin:8px 0}.timerBtns{display:flex;justify-content:center;gap:8px}.stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #292929}.stat:last-child{border-bottom:0}.hidden{display:none}.note{color:#ddd;font-size:13px;line-height:1.45}.footer{color:#777;font-size:11px;text-align:center;margin:18px}
+</style>
+</head>
+<body>
+<header><h1>L-Bum Workout</h1><div class="sub">5-day CBum-inspired hypertrophy plan • no flat pressing</div></header>
+<nav class="tabs" id="tabs"></nav>
+<main class="wrap" id="app"></main>
+<div class="bottom"><button class="btn primary" onclick="saveAll()">Save workout</button><button class="btn" onclick="resetDay()">Reset day</button><button class="btn" onclick="showTimer()">Timer</button></div>
+<script>
+const days=[
+{name:"Monday",focus:"Chest + Biceps",ex:[
+["Incline DB Press","3 × 6–10","2–3 min","30–32 kg DBs"],["Cable High-to-Low Fly","3 × 8–12","60–90 sec",""],["Cable Fly","3 × 10–15","60–90 sec",""],["Cable Fly — Finisher","2 × 15–20","60–90 sec","Last set: drop set"],["EZ-Bar Curl","3 × 8–12","60–90 sec",""],["Incline DB Curl","3 × 10–12","60–90 sec",""],["Hammer Curl","2 × 10–15","60–90 sec",""]]},
+{name:"Tuesday",focus:"Back + Rear Delts",ex:[
+["Lat Pulldown","4 × 6–10","2–3 min","Target ~70–80 kg"],["Single-Arm Cable Lat Pulldown","3 × 10–12 each","60–90 sec",""],["Chest-Supported Row","3 × 8–12","2–3 min","Alternative: Seated Cable Row"],["Neutral-Grip Pulldown","3 × 10–12","60–90 sec",""],["Cable Row — Wider Elbows","2 × 10–15","60–90 sec",""],["Reverse Pec Deck","3 × 12–20","60–90 sec",""],["Cable Rear-Delt Fly","2 × 15–20","60–90 sec",""]]},
+{name:"Wednesday",focus:"Legs + Abs",ex:[
+["Leg Press","4 × 8–12","2–3 min","Current ~180 kg + sled"],["Smith Machine Glute Bridge","3 × 8–12","2–3 min",""],["Leg Extension","3 × 10–15","60–90 sec","Last set: drop set"],["Seated/Lying Leg Curl","3 × 10–15","60–90 sec",""],["Calf Raise","4 × 10–15","60–90 sec",""],["Reverse Crunch","3 × 12–15","60–90 sec",""],["Cable Crunch","3 × 10–15","60–90 sec",""],["Dead Bug","2 × 8–12 each side","60 sec",""]]},
+{name:"Thursday",focus:"Shoulders + Triceps",ex:[
+["Machine Shoulder Press","3 × 8–10","2–3 min",""],["Cable Lateral Raise","4 × 10–15 each","60–90 sec",""],["DB/Cable Lateral Raise","3 × 12–20","60–90 sec",""],["Reverse Pec Deck","3 × 12–20","60–90 sec",""],["Cable Pressdown","3 × 8–12","60–90 sec",""],["Overhead Cable Extension","3 × 10–15","60–90 sec",""],["Single-Arm Cable Pressdown","2 × 12–15 each","60–90 sec",""],["Rope Pressdown","1–2 × 15–20","60–90 sec",""]]},
+{name:"Friday",focus:"Chest + Back + Arms",ex:[
+["Incline Machine Press","3 × 8–12","2–3 min",""],["Cable High-to-Low Fly","3 × 10–15","60–90 sec",""],["Cable Chest Press","3 × 10–15","60–90 sec",""],["Pec Deck","2–3 × 12–20","60–90 sec",""],["Wide-Grip Pulldown","3 × 8–12","2–3 min",""],["Seated Cable Row","3 × 8–12","2–3 min",""],["Preacher Curl","3 × 8–12","60–90 sec",""],["Rope Hammer Curl","2 × 10–15","60–90 sec",""],["Overhead Rope Extension","3 × 10–15","60–90 sec",""],["Rope Pressdown","2 × 12–15","60–90 sec",""]]}
+];
+let active=0, timer=0, interval=null;
+const key=()=>`lbum_${days[active].name}`;
+function renderTabs(){tabs.innerHTML=days.map((d,i)=>`<button class="${i===active?'active':''}" onclick="active=${i};render()">${d.name.slice(0,3)}</button>`).join('')}
+function render(){
+ renderTabs();
+ const d=days[active], saved=JSON.parse(localStorage.getItem(key())||'{}');
+ app.innerHTML=`<div class="card"><div class="dayhead"><h2>${d.name} — ${d.focus}</h2><span class="tag">${active===4?'Chest focus':''}</span></div>
+ <p class="note">Compounds: keep about 1–2 reps in reserve. Isolation: final set can approach failure with controlled form. Progress when you reach the top of the rep range on all sets.</p></div>
+ ${d.ex.map((e,i)=>`<div class="card exercise"><div class="ename">${i+1}. ${e[0]}</div><div class="meta">${e[1]} • Rest ${e[2]}${e[3]?` • ${e[3]}`:''}</div>
+ <div class="row"><div class="small">Previous / target: ${saved[i]?.weight||'—'} kg</div><input inputmode="decimal" id="w${i}" placeholder="kg" value="${saved[i]?.weight||''}"><button onclick="toggleDone(this,${i})">${saved[i]?.done?'✓ Done':'Done'}</button></div></div>`).join('')}
+ <div class="card"><div class="stat"><span>Progression</span><span>Top of range → add weight</span></div><div class="stat"><span>Heavy compounds</span><span>2–3 min rest</span></div><div class="stat"><span>Isolation</span><span>60–90 sec rest</span></div></div>
+ <div class="footer">Saturday + Sunday: rest/recovery</div>`;
+}
+function toggleDone(btn,i){let s=JSON.parse(localStorage.getItem(key())||'{}');s[i]=s[i]||{};s[i].done=!s[i].done;const w=document.getElementById('w'+i);s[i].weight=w.value;localStorage.setItem(key(),JSON.stringify(s));btn.classList.toggle('done',s[i].done);btn.textContent=s[i].done?'✓ Done':'Done'}
+function saveAll(){const s=JSON.parse(localStorage.getItem(key())||'{}');days[active].ex.forEach((_,i)=>{const w=document.getElementById('w'+i);if(w){s[i]=s[i]||{};s[i].weight=w.value}});localStorage.setItem(key(),JSON.stringify(s));alert('Workout saved on this device.')}
+function resetDay(){if(confirm('Reset today’s logged weights and completed sets?')){localStorage.removeItem(key());render()}}
+function showTimer(){app.innerHTML=`<div class="card"><h2>Rest Timer</h2><div class="timer" id="clock">90</div><div class="timerBtns"><button class="btn" onclick="startTimer(60)">60s</button><button class="btn primary" onclick="startTimer(90)">90s</button><button class="btn" onclick="startTimer(120)">120s</button><button class="btn" onclick="startTimer(180)">180s</button></div><br><button class="btn" onclick="stopTimer()">Stop</button><button class="btn" onclick="render()">Back to workout</button></div>`}
+function startTimer(n){clearInterval(interval);timer=n;clock.textContent=timer;interval=setInterval(()=>{timer--;clock.textContent=timer;if(timer<=0){clearInterval(interval);navigator.vibrate?.([200,100,200]);alert('Rest complete — next set.')}},1000)}
+function stopTimer(){clearInterval(interval)}
+render();
+</script>
+</body>
+</html>
